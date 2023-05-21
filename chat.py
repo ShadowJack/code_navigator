@@ -5,6 +5,7 @@ from langchain.schema import (
         SystemMessage
     )
 from typing import List, Union
+from dotenv import load_dotenv
 
 def main():
     """
@@ -16,6 +17,7 @@ def main():
         > AI: API/Controllers/UsersController.cs
     """
 
+    load_dotenv()
     # TODO:
     # 1. Take request from user, vectorize it, finds related documents
     # 2. Give LLM found documents and ask to respond to the question
