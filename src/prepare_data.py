@@ -7,6 +7,7 @@ import sys
 import os
 from logging import error
 
+load_dotenv()
 ignored_dirs = [".DStore", "obj", "bin", ".vs", ".idea", ".git", ".gitignore"]
 file_extensions = [".cs", ".js", ".ts", ".css", "html", ".ex", ".exs"]
 deeplake_ds = os.environ.get("DEEPLAKE_DATASET")
@@ -15,7 +16,6 @@ def main():
     """
     Read source code files, vectorize them and save to Deep Lake
     """
-    load_dotenv()
 
     if len(sys.argv) < 2:
         error("A path to a code base directory must be provided")
@@ -36,7 +36,7 @@ def main():
     print(len(texts))
 
     # 3. Save them to vector store
-    DeepLake.from_documents(texts, embedding=OpenAIEmbeddings(), dataset_path=deeplake_ds)
+    DeepLake.from_documents(texts, embedding=OpenAIEmbeddings(disallowed_special=()), dataset_path=deeplake_ds)
 
 if __name__ == "__main__":
     main()
