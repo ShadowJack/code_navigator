@@ -11,7 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./code_navigator /app/code_navigator
 COPY ./__init__.py .
 COPY ./web_service.py .
-COPY .env .
 
 # Expose the port on which the app will run
 EXPOSE 8000

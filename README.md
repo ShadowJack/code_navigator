@@ -18,7 +18,7 @@ There are two options: run in docker or without it.
 #### Run in Docker
 1. Rename `.env.template` to `.env` and put your settings there
 2. Build a Docker image: `docker build -t code_navigator:latest .`
-3. Run a container: `docker run -p 8000:8000 code_navigator:latest`
+3. Run a container: `docker run -p 8000:8000 --env-file=.env code_navigator:latest`
 #### Run on the host machine
 1. Install required packages with `pip install -r requirements.txt`
 2. Rename `.env.template` to `.env` and put your settings there

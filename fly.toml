@@ -1,0 +1,14 @@
+# fly.toml app configuration file generated for code-navigator on 2023-05-27T16:24:18+08:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "code-navigator"
+primary_region = "waw"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
