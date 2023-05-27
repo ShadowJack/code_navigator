@@ -23,7 +23,7 @@ A chat-bot that answers questions about a code base.
 
 ### POST /loadFromGitHub
 Process your source code that's located on GitHub and upload it to a vector storage. 
-Note: only public repositories are supported for now. To upload you private repo you need to download it to your local machine and then use the [console app](#As a console app) to upload it.
+Note: only public repositories are supported for now. To upload you private repo you need to download it to your local machine and then use the [console app](#as-a-console-app) to upload it.
 
 #### Body parameters:
 * repositoryUrl - required a path to the repo on GitHub, ex. 'microsoft/slow-cheetah'
