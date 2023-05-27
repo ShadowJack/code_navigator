@@ -34,6 +34,6 @@ class Chat:
         memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         self._ask = ConversationalRetrievalChain.from_llm(llm, retriever=retriever, memory=memory)
 
-    def ask(self, question):
+    def ask(self, question: str) -> str:
         result = self._ask({"question": question})
         return result['answer']
