@@ -22,8 +22,7 @@ There are two options: run in docker or without it.
 #### Run on the host machine
 1. Install required packages with `pip install -r requirements.txt`
 2. Rename `.env.template` to `.env` and put your settings there
-3. Set up additional environment variables: `export FLASK_APP=web_service.py && export FLASK_ENV=development`
-4. Run the server: `flask run`
+3. Run the server: `uvicorn web_service:app --reload `
 
 ## Web service API
 
