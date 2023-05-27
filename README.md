@@ -14,6 +14,12 @@ A chat-bot that answers questions about a code base.
 4. Run chat.py with `python run_chat.py`
 5. Start asking questions about the code
 ### As a web service
+There are two options: run in docker or without it.
+#### Run in Docker
+1. Rename `.env.template` to `.env` and put your settings there
+2. Build a Docker image: `docker build -t code_navigator:latest .`
+3. Run a container: `docker run -p 5000:5000 code_navigator:latest`
+#### Run on the host machine
 1. Install required packages with `pip install -r requirements.txt`
 2. Rename `.env.template` to `.env` and put your settings there
 3. Set up additional environment variables: `export FLASK_APP=web_service.py && export FLASK_ENV=development`
