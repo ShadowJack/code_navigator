@@ -115,7 +115,6 @@ class GitHubDataLoader:
         # Load documents
         docs = []
         repo_dir = self._download_repository(repository_url)
-        print(repo_dir)
         for dirpath, _, filenames in os.walk(repo_dir):
             if all(ignored_dir not in dirpath for ignored_dir in self._ignored_dirs) and (len(sub_paths) == 0 or any(sub_path in dirpath for sub_path in sub_paths)):
                 for filename in filenames:
