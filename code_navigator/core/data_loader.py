@@ -24,8 +24,8 @@ class DataLoader:
     Loader that retrieves source code from the file system
     """
     def __init__(self,
-                 ignored_dirs = [".DStore", "obj", "bin", ".vs", ".idea", ".git", ".gitignore"],
-                 file_extensions = [".cs", ".js", ".ts", ".css", "html", ".ex", ".exs"],
+                 ignored_dirs = [".DStore", "obj", "bin", ".vs", ".idea", ".git", ".gitignore", "_build", "deps", "node_modules", "__pycache__"],
+                 file_extensions = [".cs", ".js", ".ts", ".css", ".html", ".ex", ".exs", ".md", ".json", ".yml", "Dockerfile", ".config", ".sh"],
                  deeplake_ds = None) -> None:
         """
         Initialize the DataLoader instance.
