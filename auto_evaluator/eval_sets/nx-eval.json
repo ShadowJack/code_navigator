@@ -1,0 +1,18 @@
+[
+    {
+      "question": "What module is responsible for automatic differentiation functionality?",
+      "answer": "The most of automatic differentiation functionality is implemented in the `Nx.Defn.Grad` module. But the `Nx.Defn` module also contains a `grad` method that can be used for automatic differentiation."
+    },
+    {
+      "question": "Where is the Nx.Defn.Grad module used and what is it used for?",
+      "answer": "The `Nx.Defn.Grad` module is used by the `Nx.Defn` module. It is used to compute the gradient of the given function."
+    },
+    {
+      "question": "What is the Nx.Serving module used for?",
+      "answer": "The `Nx.Serving` module encapsulates client and server work to perform batched requests."
+    },
+    {
+      "question": "How to set names for tensor dimensions?",
+      "answer": "To set names for tensor dimensions you need to pass them in the `names:` key when initializing a new tensor. For example: `Nx.tensor([[1, 2, 3], [4, 5, 6]], names: [:x, :y])`"
+    }
+]

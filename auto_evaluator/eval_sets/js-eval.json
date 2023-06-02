@@ -1,0 +1,82 @@
+[
+    {
+      "question": "What is the purpose of this project/application?",
+      "answer": "The purpose of this project is to help visitors buy or rent a real estate property in different countries."
+    },
+    {
+      "question": "Can you give me an overview of the architecture and high-level design of the codebase?",
+      "answer": "Sure. The application consists of server side and client side. Server side is implemented using Express framework. Client side is using React and Redux libraries. Any request that's handled by the server is passing a few middlewares that have different responsibilities, ex. authentication, bot detection, browser support verification, content retrieval etc. Then, once all middlewares are passed, request is handled by client side. The data flow in the UI is unidirectional. All application state is stored in Redux store. Different Actions and Reducers are responsible for modification of the Redux store. Sagas are used for long-running asyncronous processes. React Router is used to decide which components to render."
+    },
+    {
+      "question": "Which version of Node.js is being used?",
+      "answer": "The Node.js version is 16.13.0 or later."
+    },
+    {
+      "question": "How are dependencies managed in this project?",
+      "answer": "Dependencies are managed via npm. All dependencies are listed in the `package.json` file."
+    },
+    {
+      "question": "Are there any specific Node.js modules or libraries that are heavily used?",
+      "answer": "The most heavily used libraries are axios, react, redux"
+    },
+    {
+      "question": "Which version of React is being used?",
+      "answer": "React version is 16.14.0"
+    },
+    {
+      "question": "How are React components structured and organized?",
+      "answer": "All React components are split into two groups: Containers and Components. Containers are stateful, while Components are functional and don't persist any state."
+    },
+    {
+      "question": "Are there any specific state management libraries being used?",
+      "answer": "Yes, Redux is used for state management."
+    },
+    {
+      "question": "How is the project built and bundled for production?",
+      "answer": "The project is built with Azure DevOps pipeline. The project is served by Nginx and Node.js."
+    },
+    {
+      "question": "What tools or build scripts are used?",
+      "answer": "`azure-pipelines-release.yml` script defines the whole deployment pipeline. Docker images are described by `build/nginx/Dockerfile` and `build/node/Dockerfile`."
+    },
+    {
+      "question": "Are there any specific testing frameworks or libraries being used?",
+      "answer": "Jest library is used for testing."
+    },
+    {
+      "question": "Is there any code linting or static analysis in place?",
+      "answer": "Yes, eslint library is used for linting."
+    },
+    {
+      "question": "Are there any existing user management modules or libraries being used?",
+      "answer": "`src/services/users/index.js` module contains helper functions for doing different things with users."
+    },
+    {
+      "question": "How does authentication work?",
+      "answer": "Authentication is managed by `authMiddleware`.Here's a step-by-step breakdown of what the middleware does: It first checks whether the req.portal.private.identity.authorization.clientId property is defined. If not, it throws an error indicating that the ClientId is not defined for the Portal. Next, the middleware reads authentication-related data from the request cookies. It initializes variables for token, decodedToken, refreshToken, and profile. An IdentityServer instance is created, using the req object. If a token is found in the cookies, it validates the token using the validateToken method of the IdentityServer. The validated token and its decoded form are stored in the respective variables. The profile is then refreshed by calling the refreshProfile function with relevant parameters, including the profile from the cookies and the token and decodedToken obtained in the previous steps. If the token or the authentication state in the decoded token doesn't match the profile's authentication state, it proceeds to refresh the token by calling either refreshExpiredToken or getGuest functions. The resulting values of token, decodedToken, refreshToken, and profile are assigned using destructuring. If the token is present, and the profile has an ID but no authentication state, it fetches the profile from the IdentityServer using the getProfile method. Several properties (req.token, req.isFull, req.isTokenAuthenticated, req.refreshToken, req.profile, and req.decodedToken) are assigned values based on the obtained and processed data. Cookies are set or cleared based on the obtained values using the setTokenCookie function and res.clearCookie. Finally, if no errors occur during the execution, the middleware calls the next function to pass control to the next middleware or route handler. If an error occurs during the execution, the middleware catches the exception. It then tries to retrieve guest authentication data from the IdentityServer. If successful, the obtained authentication data is assigned to relevant request properties, cookies are set using setTokenCookie, and the next function is called. If retrieving guest authentication data also fails, the middleware clears the refresh token cookie, and the error is passed to the next middleware or route handler. In summary, the authMiddleware function handles authentication-related tasks, such as token validation, profile refreshing, and setting appropriate request properties and cookies. It ensures that requests are properly authenticated before allowing them to proceed further in the application's middleware or route handling pipeline."
+    },
+    {
+      "question": "Where is the authentication module?",
+      "answer": "It's avaialable at `src/server/middleware/auth/index.js`"
+    },
+    {
+      "question": "Where's a module that's responsible for user logout?",
+      "answer": "It's available at `src/server/routes/logout/index.js`"
+    },
+    {
+      "question": "How does logout work?",
+      "answer": "Logout functionality is handled in `src/server/routes/logout/index.js`. This module clears token-related cookies, revokes the refresh token if available, handles redirect URLs if provided, and redirects the user accordingly. If any errors occur during the process, they are caught, logged, and an appropriate error response is sent back to the client."
+    },
+    {
+      "question": "How are user sessions stored?",
+      "answer": "User sessions are stored in a Json Web Token format in the following cookies: `token`, `refreshToken`, `profile`."
+    },
+    {
+      "question": "Where should I start to learn how translations work?",
+      "answer": "The best places to start to learn how translations work are `src/store/translations/` or `src/containers/TranslationContainer/index.js`"
+    },
+    {
+      "question": "How bot detection works?",
+      "answer": "Bot detection functionality is located in `botMiddleware` module at `src/server/middleware/bot/index.js`. It's based on the decoded access token - it checks if the token's `isBot` field is `true`."
+    }
+]
