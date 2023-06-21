@@ -2,8 +2,10 @@ from zipfile import ZipFile
 import os
 import requests
 from langchain.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter, Language
 from langchain.embeddings import OpenAIEmbeddings
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain.vectorstores import DeepLake
 
 # Helper functions
@@ -12,9 +14,30 @@ def _split_and_upload(docs, deeplake_ds) -> DeepLake:
     Split documents into chunks and upload them to the vector store
     """
     # Chunk them
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+    text_splitter = RecursiveCharacterTextSplitter.from_language(
+        language=Language.JS, chunk_size=1000, chunk_overlap=0
+    )
     texts = text_splitter.split_documents(docs)
-    print(len(texts))
+    print(f"Total number of code chunks: {len(texts)}")
+    #  llm = OpenAI(model="text-davinci-003", temperature=0.3)
+    chat = ChatOpenAI(temperature=0.3, model="gpt-3.5-turbo-0613")
+    system_template = "You are a technical writer assistant. Your task is to write a summary of a code. Write only the summary, nothing else."
+    human_template = """
+        Here's is the code:
+        ```
+        {code}
+        ```
+        Summary:
+    """
+    chat_prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(system_template),
+        HumanMessagePromptTemplate.from_template(human_template)
+        ])
+    for text in texts:
+        messages = chat_prompt.format_prompt(code=text.page_content).to_messages()
+        llm_result = chat.generate([messages])
+        text.metadata["summary"] = llm_result.generations[0][0].text
+        print(f"Chunk summary: {text.metadata}")
 
     # Save them to vector store
     return DeepLake.from_documents(texts, embedding=OpenAIEmbeddings(client=None,disallowed_special=()), dataset_path=deeplake_ds)
@@ -69,7 +92,7 @@ class DataLoader:
                     for filename in filenames:
                         if any(filename.endswith(file_extension) for file_extension in self._file_extensions):
                             loader = TextLoader(os.path.join(dirpath, filename), encoding="utf-8")
-                            docs.extend(loader.load_and_split())
+                            docs.extend(loader.load())
 
         return _split_and_upload(docs, self._deeplake_ds)
 
@@ -120,7 +143,7 @@ class GitHubDataLoader:
                 for filename in filenames:
                     if any(filename.endswith(file_extension) for file_extension in self._file_extensions):
                         loader = TextLoader(os.path.join(dirpath, filename), encoding="utf-8")
-                        docs.extend(loader.load_and_split())
+                        docs.extend(loader.load())
 
         return _split_and_upload(docs, self._deeplake_ds)
 
