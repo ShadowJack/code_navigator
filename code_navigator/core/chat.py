@@ -1,7 +1,7 @@
 from langchain.vectorstores import DeepLake
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import ConversationalRetrievalChain, RetrievalQA
 from langchain.memory import ConversationBufferMemory
 import os
 
@@ -25,15 +25,17 @@ class Chat:
         # 2. Set up a retriever that'll vectorize user query and run a search on the vector storage
         retriever = db.as_retriever()
         retriever.search_kwargs['distance_metric'] = 'cos' # use cosine to measure distance between vectors (ignores the length of vectors, takes into account only their colliniarity)
-        retriever.search_kwargs['fetch_k'] = 20 # Number of documents to pass in a batch to Min-Min-Roughness clustering algorithm
+        retriever.search_kwargs['fetch_k'] = 10 # Number of documents to pass in a batch to Min-Min-Roughness clustering algorithm
         retriever.search_kwargs['maximal_marginal_relevance'] = True # Optimize for similarity to query AND diversity among the selected documents
-        retriever.search_kwargs['k'] = 20 # number of documents to return
+        retriever.search_kwargs['k'] = 10 # number of documents to return
 
         # 3. Setup a chat and run it
         llm = ChatOpenAI(model='gpt-3.5-turbo')
-        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-        self._ask = ConversationalRetrievalChain.from_llm(llm, retriever=retriever, memory=memory)
+        self._ask = RetrievalQA.from_chain_type(llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
+        #  memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+        #  self._ask = ConversationalRetrievalChain.from_llm(llm, retriever=retriever) #, memory=memory)
 
     def ask(self, question: str) -> str:
-        result = self._ask({"question": question})
-        return result['answer']
+        result = self._ask({'query': question})
+        print(result)
+        return result['result']
