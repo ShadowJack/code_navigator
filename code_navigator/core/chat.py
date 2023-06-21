@@ -1,8 +1,7 @@
 from langchain.vectorstores import DeepLake
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationalRetrievalChain, RetrievalQA
-from langchain.memory import ConversationBufferMemory
+from langchain.chains import RetrievalQA, RetrievalQAWithSourcesChain
 import os
 
 class Chat:
@@ -29,11 +28,10 @@ class Chat:
         retriever.search_kwargs['maximal_marginal_relevance'] = True # Optimize for similarity to query AND diversity among the selected documents
         retriever.search_kwargs['k'] = 10 # number of documents to return
 
-        # 3. Setup a chat and run it
-        llm = ChatOpenAI(model='gpt-3.5-turbo')
+        # 3. Setup a chat
+        #TODO: build a custom chain similar to RetrievalQAWithSourcesChain but with usage of summary metadata
+        llm = ChatOpenAI(model='gpt-3.5-turbo-0613')
         self._ask = RetrievalQA.from_chain_type(llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
-        #  memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-        #  self._ask = ConversationalRetrievalChain.from_llm(llm, retriever=retriever) #, memory=memory)
 
     def ask(self, question: str) -> str:
         result = self._ask({'query': question})

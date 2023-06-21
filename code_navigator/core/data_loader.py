@@ -1,6 +1,7 @@
 from zipfile import ZipFile
 import os
 import requests
+from langchain.schema import Document
 from langchain.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter, Language
 from langchain.embeddings import OpenAIEmbeddings
@@ -41,6 +42,43 @@ def _split_and_upload(docs, deeplake_ds) -> DeepLake:
 
     # Save them to vector store
     return DeepLake.from_documents(texts, embedding=OpenAIEmbeddings(client=None,disallowed_special=()), dataset_path=deeplake_ds)
+
+def _split_summarize_and_upload_summary(docs, deeplake_ds) -> DeepLake:
+    """
+    Split documents into chunks, summarize each chunk and upload the summaries to the vector store
+    """
+    # Chunk them
+    text_splitter = RecursiveCharacterTextSplitter.from_language(
+        language=Language.JS, chunk_size=1400, chunk_overlap=0
+    )
+    texts = text_splitter.split_documents(docs)
+    print(f"Total number of code chunks: {len(texts)}")
+
+    # Summarize
+    chat = ChatOpenAI(temperature=0.3, model="gpt-3.5-turbo-0613")
+    system_template = "You are a technical writer assistant. Your task is to write a summary of a code. Write only the summary, nothing else."
+    human_template = """
+        Here's is the code:
+        ```
+        {code}
+        ```
+        Summary:
+    """
+    chat_prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(system_template),
+        HumanMessagePromptTemplate.from_template(human_template)
+        ])
+    docs = []
+    for text in texts:
+        messages = chat_prompt.format_prompt(code=text.page_content).to_messages()
+        llm_result = chat.generate([messages])
+        # Construct a new document containing the summary of the chunk
+        doc = Document(page_content=llm_result.generations[0][0].text, metadata={'text': text.page_content, 'source': text.metadata['source']})
+        docs.append(doc)
+        print(f".")
+
+    # Save them to vector store
+    return DeepLake.from_documents(docs, embedding=OpenAIEmbeddings(client=None,disallowed_special=()), dataset_path=deeplake_ds)
 
 class DataLoader:
     """
@@ -94,7 +132,7 @@ class DataLoader:
                             loader = TextLoader(os.path.join(dirpath, filename), encoding="utf-8")
                             docs.extend(loader.load())
 
-        return _split_and_upload(docs, self._deeplake_ds)
+        return _split_summarize_and_upload_summary(docs, self._deeplake_ds)
 
 class GitHubDataLoader:
     """
@@ -145,7 +183,7 @@ class GitHubDataLoader:
                         loader = TextLoader(os.path.join(dirpath, filename), encoding="utf-8")
                         docs.extend(loader.load())
 
-        return _split_and_upload(docs, self._deeplake_ds)
+        return _split_summarize_and_upload_summary(docs, self._deeplake_ds)
 
     def _download_repository(self, repository_url: str) -> str:
         """
