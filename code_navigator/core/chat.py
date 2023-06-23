@@ -1,7 +1,8 @@
 from langchain.vectorstores import DeepLake
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQA, RetrievalQAWithSourcesChain
+from langchain.chains import RetrievalQA, QAWithSourcesChain
+from code_navigator.core.prompts import DOCUMENT_PROMPT, QUESTION_PROMPT, COMBINE_PROMPT
 import os
 
 class Chat:
@@ -27,13 +28,20 @@ class Chat:
         retriever.search_kwargs['fetch_k'] = 10 # Number of documents to pass in a batch to Min-Min-Roughness clustering algorithm
         retriever.search_kwargs['maximal_marginal_relevance'] = True # Optimize for similarity to query AND diversity among the selected documents
         retriever.search_kwargs['k'] = 10 # number of documents to return
+        self._retriever = retriever
 
         # 3. Setup a chat
-        #TODO: build a custom chain similar to RetrievalQAWithSourcesChain but with usage of summary metadata
-        llm = ChatOpenAI(model='gpt-3.5-turbo-0613')
-        self._ask = RetrievalQA.from_chain_type(llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
+        llm = ChatOpenAI(model='gpt-3.5-turbo-16k-0613', temperature=0.3)
+        #  self._ask = RetrievalQA.from_chain_type(llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
+        self._ask = QAWithSourcesChain.from_llm(
+                llm,
+                document_prompt=DOCUMENT_PROMPT,
+                question_prompt=QUESTION_PROMPT,
+                combine_prompt=COMBINE_PROMPT,
+                )
 
     def ask(self, question: str) -> str:
-        result = self._ask({'query': question})
+        docs = self._retriever.get_relevant_documents(question)
+        result = self._ask({'question': question, 'docs': docs})
         print(result)
-        return result['result']
+        return result['answer']

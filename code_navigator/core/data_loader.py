@@ -12,7 +12,7 @@ from langchain.vectorstores import DeepLake
 # Helper functions
 def _split_and_upload(docs, deeplake_ds) -> DeepLake:
     """
-    Split documents into chunks and upload them to the vector store
+    Obsolete: split documents into chunks and upload them to the vector store
     """
     # Chunk them
     text_splitter = RecursiveCharacterTextSplitter.from_language(
@@ -20,7 +20,7 @@ def _split_and_upload(docs, deeplake_ds) -> DeepLake:
     )
     texts = text_splitter.split_documents(docs)
     print(f"Total number of code chunks: {len(texts)}")
-    #  llm = OpenAI(model="text-davinci-003", temperature=0.3)
+    # Summarize them
     chat = ChatOpenAI(temperature=0.3, model="gpt-3.5-turbo-0613")
     system_template = "You are a technical writer assistant. Your task is to write a summary of a code. Write only the summary, nothing else."
     human_template = """
